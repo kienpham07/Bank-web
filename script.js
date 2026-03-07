@@ -7,7 +7,7 @@
 // Data
 const account1 = {
   owner: 'Kien Pham',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
+  movements: [200, 455.23, -306.5, 25000, -642.21, -133.9, 79.97, 1300],
   interestRate: 1.2, // %
   pin: 1111,
 
@@ -50,6 +50,19 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+
+  movementsDates: [
+    '2020-01-05T10:15:33.035Z',
+    '2020-01-30T09:48:16.867Z',
+    '2020-02-25T06:04:23.907Z',
+    '2020-03-25T14:18:46.235Z',
+    '2020-04-05T16:33:06.386Z',
+    '2020-05-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const account4 = {
@@ -57,6 +70,16 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+
+  movementsDates: [
+    '2020-02-01T13:15:33.035Z',
+    '2020-03-15T09:48:16.867Z',
+    '2020-04-20T06:04:23.907Z',
+    '2020-05-25T14:18:46.235Z',
+    '2020-07-10T16:33:06.386Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -102,7 +125,7 @@ const displayMovements = function (movements, sort = false) {
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-        <div class="movements__value">${mov} $</div>
+        <div class="movements__value">${mov.toFixed(2)} $</div>
       </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -111,26 +134,26 @@ const displayMovements = function (movements, sort = false) {
 
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((accs, movs) => accs + movs, 0);
-  labelBalance.textContent = `${acc.balance} $`;
+  labelBalance.textContent = `${acc.balance.toFixed(2)} $`;
 };
 
 const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
     .filter(movs => movs > 0)
     .reduce((accs, movs) => accs + movs, 0);
-  labelSumIn.textContent = `${incomes} $`;
+  labelSumIn.textContent = `${incomes.toFixed(2)} $`;
 
   const out = acc.movements
     .filter(movs => movs < 0)
     .reduce((accs, movs) => accs + movs, 0);
-  labelSumOut.textContent = `${Math.abs(out)} $`;
+  labelSumOut.textContent = `${Math.abs(out).toFixed(2)} $`;
 
   const interest = acc.movements
     .filter(movs => movs > 0)
     .map(deposit => (deposit * acc.interestRate) / 100)
     .filter(int => int >= 1)
     .reduce((accs, movs) => accs + movs, 0);
-  labelSumInterest.textContent = `${interest} $`;
+  labelSumInterest.textContent = `${interest.toFixed(2)} $`;
 };
 
 const createUsername = function (accs) {
@@ -213,7 +236,7 @@ btnTransfer.addEventListener('click', function (e) {
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
 
-  const amount = Number(inputLoanAmount.value);
+  const amount = Math.floor(Number(inputLoanAmount.value));
   if (
     amount > 0 &&
     currentAccount.movements.some(movs => movs > amount * 0.1)
@@ -248,12 +271,13 @@ btnClose.addEventListener('click', function (e) {
   inputCloseUsername.value = inputClosePin.value = '';
 });
 
+// Change sorted state when click the sort button multiple times
 let sorted = false;
 btnSort.addEventListener('click', function (e) {
   e.preventDefault();
 
   displayMovements(currentAccount.movements, !sorted);
-  sorted = !sorted; // Change sorted state when click the sort button multiple times
+  sorted = !sorted;
 });
 
 // ---------- Test accounts modal logic ----------
