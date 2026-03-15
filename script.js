@@ -7,7 +7,7 @@
 // Data
 const account1 = {
   owner: 'Kien Pham',
-  movements: [500.25, -120, 600.75, 15000, -300.5, -50, 200.1, 800, 90, -4999],
+  movements: [500.25, -120, 600.75, 12000, -300.5, -50, 200.1, 800, 90, -4999],
   interestRate: 1.2,
   pin: 1111,
 
@@ -24,7 +24,7 @@ const account1 = {
     new Date().toISOString(),
   ],
   currency: 'USD',
-  locale: 'en-US',
+  locale: 'vi-VN',
 };
 
 const account2 = {
@@ -68,12 +68,12 @@ const account3 = {
     new Date().toISOString(),
   ],
   currency: 'USD',
-  locale: 'en-US',
+  locale: 'vi-VN',
 };
 
 const account4 = {
   owner: 'Michael Jordan',
-  movements: [500.75, 1200, 800.5, 100, 150.25, 90, 67],
+  movements: [500.75, -1200, 800.5, 100, 150.25, -90, 67],
   interestRate: 1,
   pin: 4444,
 
@@ -126,7 +126,7 @@ const inputClosePin = document.querySelector('.form__input--pin');
 ////////////////////////////////////////////////////////////////////////////
 // Function
 
-const formatMovementDate = function (date) {
+const formatMovementDate = function (date, locale) {
   const calcDaypassed = (day1, day2) =>
     Math.round(Math.abs(day2 - day1) / (1000 * 60 * 60 * 24));
 
@@ -136,10 +136,11 @@ const formatMovementDate = function (date) {
   if (dayPassed == 1) return `Yesterday`;
   if (dayPassed <= 7) return `${dayPassed} days ago`;
   else {
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0);
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    // const day = `${date.getDate()}`.padStart(2, 0);
+    // const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    // const year = date.getFullYear();
+    // return `${day}/${month}/${year}`;
+    return new Intl.DateTimeFormat(locale).format(date);
   }
 };
 
@@ -159,7 +160,7 @@ const displayMovements = function (acc, sort = false) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
 
     const date = new Date(movementDate);
-    const displayDate = formatMovementDate(date);
+    const displayDate = formatMovementDate(date, acc.locale);
 
     const html = `
       <div class="movements__row">
@@ -226,12 +227,19 @@ updateUI(currentAccount);
 containerApp.style.opacity = 100;
 
 const now = new Date();
-const day = `${now.getDate()}`.padStart(2, 0);
-const month = `${now.getMonth() + 1}`.padStart(2, 0);
-const year = now.getFullYear();
-const hour = `${now.getHours()}`.padStart(2, 0);
-const min = `${now.getMinutes()}`.padStart(2, 0);
-labelDate.textContent = `As of ${day}/${month}/${year}, ${hour}:${min}`;
+const options = {
+  hour: 'numeric',
+  minute: 'numeric',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  weekday: 'long',
+};
+labelDate.textContent = new Intl.DateTimeFormat(
+  currentAccount.locale,
+  options,
+).format(now);
+
 /////////////////
 
 // Handle login as a form submission. This catches both clicking the
@@ -256,14 +264,29 @@ loginForm.addEventListener('submit', function (e) {
     }`;
     containerApp.style.opacity = 1; // opacity expects 0-1 range
 
-    // Create current date
+    // Create current date and time
+
     const now = new Date();
-    const day = `${now.getDate()}`.padStart(2, 0);
-    const month = `${now.getMonth() + 1}`.padStart(2, 0);
-    const year = now.getFullYear();
-    const hour = `${now.getHours()}`.padStart(2, 0);
-    const min = `${now.getMinutes()}`.padStart(2, 0);
-    labelDate.textContent = `As of ${day}/${month}/${year}, ${hour}:${min}`;
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      weekday: 'long',
+    };
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      options,
+    ).format(now);
+
+    // const now = new Date();
+    // const day = `${now.getDate()}`.padStart(2, 0);
+    // const month = `${now.getMonth() + 1}`.padStart(2, 0);
+    // const year = now.getFullYear();
+    // const hour = `${now.getHours()}`.padStart(2, 0);
+    // const min = `${now.getMinutes()}`.padStart(2, 0);
+    // labelDate.textContent = `As of ${day}/${month}/${year}, ${hour}:${min}`;
 
     // Update UI
     updateUI(currentAccount);
