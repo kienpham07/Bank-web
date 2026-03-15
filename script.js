@@ -7,7 +7,7 @@
 // Data
 const account1 = {
   owner: 'Kien Pham',
-  movements: [500.25, -120, 600.75, 15000, -300.5, -50, 200.1, 800],
+  movements: [500.25, -120, 600.75, 15000, -300.5, -50, 200.1, 800, 90, -4999],
   interestRate: 1.2,
   pin: 1111,
 
@@ -20,6 +20,8 @@ const account1 = {
     '2025-06-25T16:50:00.000Z',
     '2025-07-30T19:10:00.000Z',
     '2025-08-05T12:25:00.000Z',
+    new Date(Date.now() - 3 * 86400000).toISOString(),
+    new Date().toISOString(),
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -27,7 +29,7 @@ const account1 = {
 
 const account2 = {
   owner: 'Stephen Curry',
-  movements: [6000, 3200.5, -200, -850.75, -3100, -1200, 9000.1, -50],
+  movements: [6000, 3200.5, -200, -850.75, -3100, -1200, 9000.1, -50, 60, -599],
   interestRate: 1.5,
   pin: 2222,
 
@@ -40,6 +42,8 @@ const account2 = {
     '2025-05-12T13:20:00.000Z',
     '2025-06-22T17:55:00.000Z',
     '2025-07-18T11:05:00.000Z',
+    new Date(Date.now() - 4 * 86400000).toISOString(),
+    new Date().toISOString(),
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -47,7 +51,7 @@ const account2 = {
 
 const account3 = {
   owner: 'Lebron James',
-  movements: [300, -150.5, 400.25, -250, -60.75, 100, 500.5, -300],
+  movements: [300, -150.5, 400.25, -250, -60.75, 100, 500.5, -300, 1299, -6.7],
   interestRate: 0.7,
   pin: 3333,
 
@@ -60,6 +64,8 @@ const account3 = {
     '2025-05-01T18:50:00.000Z',
     '2025-06-18T20:05:00.000Z',
     '2025-07-22T09:40:00.000Z',
+    new Date(Date.now() - 5 * 86400000).toISOString(),
+    new Date().toISOString(),
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -67,7 +73,7 @@ const account3 = {
 
 const account4 = {
   owner: 'Michael Jordan',
-  movements: [500.75, 1200, 800.5, 100, 150.25],
+  movements: [500.75, 1200, 800.5, 100, 150.25, 90, 67],
   interestRate: 1,
   pin: 4444,
 
@@ -77,6 +83,8 @@ const account4 = {
     '2025-04-15T08:40:00.000Z',
     '2025-05-18T14:25:00.000Z',
     '2025-06-20T16:30:00.000Z',
+    new Date(Date.now() - 1 * 86400000).toISOString(),
+    new Date().toISOString(),
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -115,6 +123,26 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+////////////////////////////////////////////////////////////////////////////
+// Function
+
+const formatMovementDate = function (date) {
+  const calcDaypassed = (day1, day2) =>
+    Math.round(Math.abs(day2 - day1) / (1000 * 60 * 60 * 24));
+
+  const dayPassed = calcDaypassed(new Date(), date);
+
+  if (dayPassed == 0) return `Today`;
+  if (dayPassed == 1) return `Yesterday`;
+  if (dayPassed <= 7) return `${dayPassed} days ago`;
+  else {
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+};
+
 const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
 
@@ -131,14 +159,11 @@ const displayMovements = function (acc, sort = false) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
 
     const date = new Date(movementDate);
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0);
-    const year = date.getFullYear();
-    const displayDate = `${day}/${month}/${year}`;
+    const displayDate = formatMovementDate(date);
 
     const html = `
       <div class="movements__row">
-        <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+        <div class="movements__type movements__type--${type}">${i + 1}. ${type}</div>
         <div class="movements__date">${displayDate}</div>
         <div class="movements__value">${movement.toFixed(2)} $</div>
       </div>`;
