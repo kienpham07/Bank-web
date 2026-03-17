@@ -237,30 +237,43 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
+// Set the timer for inactivity in each account
+const startLogOutTimer = function () {
+  const decreaseTime = function () {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const second = String(Math.trunc(time % 60)).padStart(2, 0);
+
+    // In each call, print the remaining time to UI
+    labelTimer.textContent = `${min}:${second}`;
+
+    // When 0 second, stop timer and log out
+    if (time == 0) {
+      clearTimeout(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+
+    // Decrease the timer by 1 second
+    time--;
+  };
+
+  // Set time to 2.5 minutes
+  let time = 90;
+
+  // Call the timer every second
+  decreaseTime();
+  const timer = setInterval(decreaseTime, 1000);
+  return timer;
+};
+
 ///////////////////////////////
 // Event Handler
-let currentAccount;
+let currentAccount, timer;
 
 // FAKE ALWAYS LOGGED IN
-currentAccount = account1;
-updateUI(currentAccount);
-containerApp.style.opacity = 100;
-
-const now = new Date();
-const options = {
-  hour: 'numeric',
-  minute: 'numeric',
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  weekday: 'long',
-};
-labelDate.textContent = new Intl.DateTimeFormat(
-  currentAccount.locale,
-  options,
-).format(now);
-
-/////////////////
+// currentAccount = account1;
+// updateUI(currentAccount);
+// containerApp.style.opacity = 100;
 
 // Handle login as a form submission. This catches both clicking the
 // login arrow and pressing Enter in either field. Normalise the
@@ -274,10 +287,6 @@ loginForm.addEventListener('submit', function (e) {
   currentAccount = accounts.find(acc => acc.username === username);
 
   if (currentAccount && currentAccount.pin === pin) {
-    // Clear input fields
-    inputLoginUsername.value = inputLoginPin.value = '';
-    inputLoginPin.blur();
-
     // Display UI message
     labelWelcome.textContent = `Welcome back, ${
       currentAccount.owner.split(' ')[1]
@@ -285,20 +294,26 @@ loginForm.addEventListener('submit', function (e) {
     containerApp.style.opacity = 1; // opacity expects 0-1 range
 
     // Create current date and time
-
-    const now = new Date();
-    const options = {
-      hour: 'numeric',
-      minute: 'numeric',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      weekday: 'long',
+    const updateClock = function () {
+      const now = new Date();
+      const options = {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        weekday: 'long',
+      };
+      labelDate.textContent = new Intl.DateTimeFormat(
+        currentAccount.locale,
+        options,
+      ).format(now);
     };
-    labelDate.textContent = new Intl.DateTimeFormat(
-      currentAccount.locale,
-      options,
-    ).format(now);
+
+    // Run every second (motion, not static)
+    updateClock();
+    setInterval(updateClock, 1000);
 
     // const now = new Date();
     // const day = `${now.getDate()}`.padStart(2, 0);
@@ -307,6 +322,14 @@ loginForm.addEventListener('submit', function (e) {
     // const hour = `${now.getHours()}`.padStart(2, 0);
     // const min = `${now.getMinutes()}`.padStart(2, 0);
     // labelDate.textContent = `As of ${day}/${month}/${year}, ${hour}:${min}`;
+
+    // Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Timer
+    if (timer) clearInterval(timer); // If timer already exists on one acc and we want to log in to ohter accs
+    timer = startLogOutTimer(); // Reset the timer for that new acc
 
     // Update UI
     updateUI(currentAccount);
@@ -341,6 +364,10 @@ btnTransfer.addEventListener('click', function (e) {
     //Update UI
     updateUI(currentAccount);
     inputTransferAmount.value = inputTransferTo.value = '';
+
+    // Reset timer once the user use the transfer operation.
+    clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
@@ -352,14 +379,20 @@ btnLoan.addEventListener('click', function (e) {
     amount > 0 &&
     currentAccount.movements.some(movs => movs > amount * 0.1)
   ) {
-    // Add movements
-    currentAccount.movements.push(amount);
+    setTimeout(function () {
+      // Add movements
+      currentAccount.movements.push(amount);
 
-    // Add Loan date
-    currentAccount.movementsDates.push(new Date().toISOString());
+      // Add Loan date
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    // Update UI
-    updateUI(currentAccount);
+      // Update UI
+      updateUI(currentAccount);
+
+      // Reset timer once the user use the transfer operation.
+      clearInterval(timer);
+      timer = startLogOutTimer();
+    }, 2000);
   }
   inputLoanAmount.value = '';
 });
