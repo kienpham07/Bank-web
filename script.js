@@ -1,7 +1,7 @@
 'use strict';
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 //            Bank Web (JS Vanilla)
 
 // Data
@@ -104,11 +104,7 @@ const labelTimer = document.querySelector('.timer');
 const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
 
-// Select the login form rather than a button. There are two elements
-// using the `.login__btn` class (instruction and submit), so the original
-// querySelector was returning the wrong element and the handler never fired
-// when the user clicked the arrow. Using the form's submit event is simpler
-// and also handles pressing Enter.
+// Select the login form rather than a button. There are two elements using the `.login__btn` class (instruction and submit). Using the form's submit event is simpler and also handles pressing Enter.
 const loginForm = document.querySelector('.login');
 const btnTransfer = document.querySelector('.form__btn--transfer');
 const btnLoan = document.querySelector('.form__btn--loan');
@@ -269,7 +265,7 @@ const logOut = function () {
   containerApp.style.opacity = 0;
 };
 
-///////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 // Event Handler
 let currentAccount, timer;
 
