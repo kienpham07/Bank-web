@@ -34,11 +34,11 @@ Visit the live application at: [https://bank-web-nu.vercel.app/](https://bank-we
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/bankist.git
-   cd bankist
+   git clone https://github.com/yourusername/Bank-web.git
+   cd Bank-web
    ```
 
-2. Open `index.html` in your web browser.
+2. Open with Live server for the `index.html` file in the folder.
 
 No additional installation or build steps required.
 
@@ -62,7 +62,7 @@ No additional installation or build steps required.
 ## Project Structure
 
 ```
-bankist/
+Bank-web/
 ├── index.html      # Main HTML structure
 ├── style.css       # Application styling
 └── script.js       # Application logic and functionality
