@@ -247,11 +247,7 @@ const startLogOutTimer = function () {
     labelTimer.textContent = `${min}:${second}`;
 
     // When 0 second, stop timer and log out
-    if (time == 0) {
-      clearTimeout(timer);
-      labelWelcome.textContent = 'Log in to get started';
-      containerApp.style.opacity = 0;
-    }
+    if (time == 0) logOut();
 
     // Decrease the timer by 1 second
     time--;
@@ -264,6 +260,13 @@ const startLogOutTimer = function () {
   decreaseTime();
   const timer = setInterval(decreaseTime, 1000);
   return timer;
+};
+
+const logOut = function () {
+  clearInterval(timer);
+  currentAccount = null;
+  labelWelcome.textContent = `Log in to get started`;
+  containerApp.style.opacity = 0;
 };
 
 ///////////////////////////////
@@ -413,7 +416,7 @@ btnClose.addEventListener('click', function (e) {
     console.log(index);
 
     // Hide UI
-    containerApp.style.opacity = 0;
+    logOut();
   }
   inputCloseUsername.value = inputClosePin.value = '';
 });
